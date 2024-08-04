@@ -49,6 +49,17 @@ public class AliOssUtil {
         try {
             // 创建PutObject请求。
             ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(bytes));
+            //文件访问路径规则 https://BucketName.Endpoint/ObjectName
+            StringBuilder stringBuilder = new StringBuilder("https://");
+            stringBuilder
+                    .append(bucketName)
+                    .append(".")
+                    .append(endpoint)
+                    .append("/")
+                    .append(objectName);
+
+            log.info("文件上传到:{}", stringBuilder.toString());
+            return stringBuilder.toString();
         } catch (OSSException oe) {
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");
@@ -56,28 +67,17 @@ public class AliOssUtil {
             System.out.println("Error Code:" + oe.getErrorCode());
             System.out.println("Request ID:" + oe.getRequestId());
             System.out.println("Host ID:" + oe.getHostId());
+            throw new Exception("捕获到OSSException，这意味着您的请求已发送到OSS,但由于某种原因被错误响应拒绝了");
         } catch (ClientException ce) {
             System.out.println("Caught an ClientException, which means the client encountered "
                     + "a serious internal problem while trying to communicate with OSS, "
                     + "such as not being able to access the network.");
             System.out.println("Error Message:" + ce.getMessage());
+            throw new Exception("捕获到ClientException，这意味着客户端遇到了,尝试与OSS通信时出现严重的内部问题，例如无法访问网络");
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();
             }
         }
-
-        //文件访问路径规则 https://BucketName.Endpoint/ObjectName
-        StringBuilder stringBuilder = new StringBuilder("https://");
-        stringBuilder
-                .append(bucketName)
-                .append(".")
-                .append(endpoint)
-                .append("/")
-                .append(objectName);
-
-        log.info("文件上传到:{}", stringBuilder.toString());
-
-        return stringBuilder.toString();
     }
 }
