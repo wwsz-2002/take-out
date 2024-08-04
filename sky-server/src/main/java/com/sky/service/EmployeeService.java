@@ -25,4 +25,6 @@ public interface EmployeeService {
     void startOrStop(Long id, Integer status);
 
     Employee getById(Long id);
+
+    void update(EmployeeDTO employeeDTO);
 }
