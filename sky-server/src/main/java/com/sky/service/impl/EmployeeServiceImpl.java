@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
@@ -10,6 +11,7 @@ import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
@@ -68,6 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @AutoFill(OperationType.INSERT)
     //创建新员工
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
@@ -76,11 +79,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         employee.setStatus(StatusConstant.ENABLE);
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setUpdateUser(id);
-        employee.setCreateUser(id);
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(id);
+//        employee.setCreateUser(id);
+        //使用统一AOP赋值
 
 
         employeeMapper.insert(employee);
@@ -110,12 +114,14 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param status
      */
     @Override
+    @AutoFill(OperationType.UPDATE)
     public void startOrStop(Long id, Integer status) {
         Employee employee = Employee.builder()
                 .status(status)
                 .id(id)
-                .updateTime(LocalDateTime.now())
-                .updateUser(BaseContext.getCurrentId())
+//                .updateTime(LocalDateTime.now())
+//                .updateUser(BaseContext.getCurrentId())
+                //AOP统一赋值
                 .build();
         //根据id更改状态
         employeeMapper.update(employee);
@@ -123,6 +129,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 根据id查询员工信息
+     *
      * @param id
      * @return
      */
@@ -135,14 +142,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 编辑员工信息
+     *
      * @param employeeDTO
      */
     @Override
+    @AutoFill(OperationType.UPDATE)
     public void update(EmployeeDTO employeeDTO) {
-        Employee employee = new Employee() ;
-        BeanUtils.copyProperties(employeeDTO,employee);
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
+        //AOP统一赋值
         employeeMapper.update(employee);
     }
 }
