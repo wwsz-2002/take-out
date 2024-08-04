@@ -13,6 +13,7 @@ import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -94,6 +95,15 @@ public class EmployeeController {
         log.info("搜索员工数据");
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    //修改员工启用禁用状态
+    @ApiOperation("启用禁用员工账号")
+    @PostMapping("status/{status}")
+    public Result startOrStop(Long id,@PathVariable Integer status){
+        log.info("启用禁用员工账号,id:{},status:{}",id,status);
+        employeeService.startOrStop(id,status);
+        return Result.success();
     }
 
 }

@@ -71,7 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     //创建新员工
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
-        BeanUtils.copyProperties(employeeDTO,employee);
+        BeanUtils.copyProperties(employeeDTO, employee);
         long id = BaseContext.getCurrentId();
 
 
@@ -83,13 +83,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreateUser(id);
 
 
-
-
         employeeMapper.insert(employee);
     }
 
     /**
      * 分页查询
+     *
      * @param employeePageQueryDTO
      * @return
      */
@@ -97,11 +96,30 @@ public class EmployeeServiceImpl implements EmployeeService {
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         PageResult pageResult = new PageResult();
         //开始分页查询
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);//进行搜索
         pageResult.setTotal(page.getTotal());//封装总数据量
         pageResult.setRecords(page.getResult());//封装数据
         return pageResult;
+    }
+
+    /**
+     * 启用禁用员工账号
+     *
+     * @param id
+     * @param status
+     */
+    @Override
+    public void startOrStop(Long id, Integer status) {
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+        //根据id更改状态
+        employeeMapper.update(employee);
     }
 
 }
