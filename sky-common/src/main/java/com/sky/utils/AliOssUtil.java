@@ -4,32 +4,47 @@ import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
+import com.aliyun.oss.common.auth.CredentialsProviderFactory;
+import com.aliyun.oss.common.auth.EnvironmentVariableCredentialsProvider;
+import com.sky.properties.AliOssProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.ByteArrayInputStream;
 
 @Data
 @AllArgsConstructor
 @Slf4j
+@Component
 public class AliOssUtil {
 
-    private String endpoint;
-    private String accessKeyId;
-    private String accessKeySecret;
-    private String bucketName;
+
+    @Autowired
+    private AliOssProperties aliOssProperties;
+    @Autowired
+    private UuidUtil uuidUtill;
 
     /**
-     * 文件上传
      *
-     * @param bytes
-     * @param objectName
+     * @param file
      * @return
+     * @throws Exception
      */
-    public String upload(byte[] bytes, String objectName) {
+    public String upload(MultipartFile file) throws Exception {
 
+        EnvironmentVariableCredentialsProvider credentialsProvider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+        String endpoint = aliOssProperties.getEndpoint();
+        String bucketName = aliOssProperties.getBucketName();
+        //获取文件字节流
+        byte[] bytes = file.getBytes();
+        //为文件获取UUID
+        String objectName = uuidUtill.getUuid(file);
         // 创建OSSClient实例。
-        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        OSS ossClient = new OSSClientBuilder().build(endpoint, credentialsProvider);
 
         try {
             // 创建PutObject请求。
