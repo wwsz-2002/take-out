@@ -6,8 +6,9 @@
         values
             (#{name},#{categoryId},#{price},#{image},#{description},#{createTime},#{updateTime},#{createUser},#{updateUser},#{status})
     </insert>
+
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
-        select d.*,c.name as actegoryName from dish as d left join category c on d.category_id = c.id
+        select d.*,c.name as categoryName from dish as d left join category c on d.category_id = c.id
         <where>
             <if test="name!=null and name!=''">and d.name like concat("%",#{name},"%")</if>
             <if test="categoryId != null">and d.category_id =#{categoryId}</if>
@@ -15,4 +16,11 @@
         </where>
         order by d.create_time desc
     </select>
+
+    <delete id="deleteByIds">
+delete from dish where id in
+                 <foreach collection="ids" item="id" separator="," open="(" close=")">
+                     #{id}
+                 </foreach>
+    </delete>
 </mapper>
