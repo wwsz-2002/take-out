@@ -117,9 +117,14 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .updateTime(LocalDateTime.now())
                 .updateUser(BaseContext.getCurrentId())
                 .build();
-
         //根据id更改状态
         employeeMapper.update(employee);
     }
 
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("****");//查询后将密码部分覆盖
+        return employee;
+    }
 }
