@@ -8,10 +8,12 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,6 +36,8 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     /**
      * 填写菜单表和数据表
@@ -145,5 +150,38 @@ public class DishServiceImpl implements DishService {
             });
             dishFlavorMapper.insertBatch(flavors);//批量插入
         }
+    }
+
+    /**
+     * 更改菜品起售状态
+     * @param status
+     * @param dishId
+     */
+    @Override
+    public void startOrStop(int status, Long dishId) {
+        Dish dish = Dish.builder()
+                .id(dishId)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+
+        //如果菜品停售
+        if(status==StatusConstant.DISABLE){//菜品对应的套餐（setmeal）也会停售
+            //根据dishId找到其对应的套餐的ID
+            List<Long> dishIds = new ArrayList<>();
+            dishIds.add(dishId);
+            List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(dishIds);
+            if (setmealIds!=null && !setmealIds.isEmpty()){
+                List<Setmeal> setmeals = new ArrayList<>();
+                for (Long setmealId : setmealIds) {
+                    Setmeal setmeal = Setmeal.builder()
+                            .status(StatusConstant.DISABLE)
+                            .id(setmealId)
+                            .build();
+                    setmealMapper.update(setmeal);
+                }
+            }
+        }
+        //写一个update方法更新套餐的数据
     }
 }
