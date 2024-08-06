@@ -49,17 +49,36 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * @return
      */
     @Bean
-    public Docket docket() {//生成接口文档，apifox上面也有
-        log.info("准备生成接口文档");
+    public Docket docketForAdmin() {//生成接口文档，apifox上面也有
+        log.info("准备生成管理端接口文档");
         ApiInfo apiInfo = new ApiInfoBuilder()
                 .title("苍穹外卖项目接口文档")
                 .version("2.0")
                 .description("苍穹外卖项目接口文档")
                 .build();
         Docket docket = new Docket(DocumentationType.SWAGGER_2)//指定自定义的标题描述版本和swagger的版本
+                .groupName("管理端")
                 .apiInfo(apiInfo)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))//指定扫描那些包来生成接口文档
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.admin"))//指定扫描那些包来生成接口文档
+                .paths(PathSelectors.any())
+                .build();
+        return docket;
+    }
+
+    @Bean
+    public Docket docketForUser() {//生成接口文档，对用户端和管理端分管
+        log.info("准备生成用户端接口文档");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("苍穹外卖项目接口文档")
+                .version("2.0")
+                .description("苍穹外卖项目接口文档")
+                .build();
+        Docket docket = new Docket(DocumentationType.SWAGGER_2)//指定自定义的标题描述版本和swagger的版本
+                .groupName("用户端")
+                .apiInfo(apiInfo)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.user"))//指定扫描那些包来生成接口文档
                 .paths(PathSelectors.any())
                 .build();
         return docket;
