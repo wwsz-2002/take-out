@@ -40,11 +40,11 @@ public class HttpClientUtil {
         String result = "";
         CloseableHttpResponse response = null;
 
-        try{
-            URIBuilder builder = new URIBuilder(url);
-            if(paramMap != null){
-                for (String key : paramMap.keySet()) {
-                    builder.addParameter(key,paramMap.get(key));
+        try{//根据发送进来的键值对，拼到请求中的数据
+            URIBuilder builder = new URIBuilder(url);//创建一个URIBuilder对象，使用传入的url初始化。
+            if(paramMap != null){//若传入的数据非空
+                for (String key : paramMap.keySet()) {//使用keySet()返回的集合进行遍历
+                    builder.addParameter(key,paramMap.get(key));//使用.addParameter进行添加数据
                 }
             }
             URI uri = builder.build();
