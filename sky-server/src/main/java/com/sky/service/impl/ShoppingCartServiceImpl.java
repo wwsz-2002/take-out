@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.controller.user.SetmealController;
 import com.sky.controller.user.ShoppingCartController;
@@ -7,6 +8,7 @@ import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.ShoppingCart;
+import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.mapper.ShoppingCartMapper;
@@ -94,6 +96,28 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void cleanShoppingCart() {
         Long userId = BaseContext.getCurrentId();
         shoppingCartMapper.deleteByUserId(userId);
+    }
+
+    @Override
+    public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        Long userId = BaseContext.getCurrentId();
+        //检测剩余数量
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        shoppingCart.setUserId(userId);
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+        if(list==null||list.isEmpty()){throw new ShoppingCartBusinessException(MessageConstant.DEL_SHOPPING_CART_DISH_NULL);}
+
+        ShoppingCart Cart = list.get(0);
+        //大于1就减1
+        if(Cart.getNumber()>1){
+            Cart.setNumber(Cart.getNumber()-1);
+            shoppingCartMapper.updateById(Cart);
+        }else {
+            //等于1就删除
+            shoppingCartMapper.deleteACart(Cart.getId());
+        }
+
     }
 
 }
