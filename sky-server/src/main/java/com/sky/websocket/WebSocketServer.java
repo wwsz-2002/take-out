@@ -22,7 +22,7 @@ public class WebSocketServer {
     private static Map<String, Session> sessionMap = new HashMap();
 
     /**
-     * 连接建立成功调用的方法
+     * 连接建立成功调用的方法a
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("sid") String sid) {
