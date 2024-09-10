@@ -53,11 +53,12 @@ public class WebSocketServer {
 
     /**
      * 群发
-     *
      * @param message
      */
     public void sendToAllClient(String message) {
+        //发送信息时候遍历所有连接
         Collection<Session> sessions = sessionMap.values();
+        //给每一个连接发送消息
         for (Session session : sessions) {
             try {
                 //服务器向客户端发送消息
